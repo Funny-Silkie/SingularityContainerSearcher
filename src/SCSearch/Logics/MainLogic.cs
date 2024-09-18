@@ -73,9 +73,9 @@ namespace SCSearch.Logics
         private async Task ShowMetadataAsync(IAsyncEnumerable<ContainerMetadata> metadata)
         {
             const string RowBlank = "  ";
-            const int NameWidth = 30;
+            const int NameWidth = 35;
             const int UploadedWidth = 16;
-            const int SizeWidth = 10;
+            const int SizeWidth = 8;
 
             await Console.Out.WriteLineAsync();
 
@@ -83,7 +83,7 @@ namespace SCSearch.Logics
             await Console.Out.WriteAsync(RowBlank);
             await Console.Out.WriteAsync("Uploaded".PadRight(UploadedWidth));
             await Console.Out.WriteAsync(RowBlank);
-            await Console.Out.WriteAsync("Size (Bytes)".PadLeft(SizeWidth));
+            await Console.Out.WriteAsync("Size".PadLeft(SizeWidth));
 
             await Console.Out.WriteLineAsync();
             await Console.Out.WriteLineAsync(new string('-', NameWidth + UploadedWidth + SizeWidth + 6));
@@ -96,7 +96,28 @@ namespace SCSearch.Logics
                 await Console.Out.WriteAsync(RowBlank);
                 await Console.Out.WriteAsync(current.UploadedAt.ToString("yyyy/MM/dd HH:mm").PadRight(UploadedWidth));
                 await Console.Out.WriteAsync(RowBlank);
-                await Console.Out.WriteAsync(current.Size.ToString().PadLeft(SizeWidth));
+
+                string sizeString;
+                ulong size = current.Size;
+                if (size < 10000UL) sizeString = $"{size}  B";
+                else
+                {
+                    size /= 1024;
+                    if (size < 10000UL) sizeString = $"{size} kB";
+                    else
+                    {
+                        size /= 1024;
+                        if (size < 10000UL) sizeString = $"{size} MB";
+                        else
+                        {
+                            size /= 1024;
+                            if (size < 10000UL) sizeString = $"{size} GB";
+                            else sizeString = $"{size / 1024} TB";
+                        }
+                    }
+                }
+
+                await Console.Out.WriteAsync(sizeString.PadLeft(SizeWidth));
                 await Console.Out.WriteLineAsync();
             }
         }

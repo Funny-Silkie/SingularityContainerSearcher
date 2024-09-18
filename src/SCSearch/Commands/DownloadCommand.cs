@@ -1,6 +1,5 @@
 ﻿using CuiLib.Commands;
 using CuiLib.Options;
-using SCSearch.Data;
 using SCSearch.Logics;
 using SCSearch.Utilities;
 
