@@ -60,7 +60,7 @@ namespace SCSearch.Logics
                 using var reader = new StreamReader(htmlDestPath);
                 using var writer = new StreamWriter(metadataPath);
 
-                await writer.WriteLineAsync(string.Join(RowSeparator, ["URL", "name", "uploaded", "size"]));
+                await writer.WriteLineAsync(string.Join(RowSeparator, "URL", "name", "uploaded", "size"));
                 await foreach (string line in reader.IterateLinesAsync())
                 {
                     Match currentMatch = GetContainerMetadataRegex().Match(line);
@@ -110,6 +110,33 @@ namespace SCSearch.Logics
             await foreach (ContainerMetadata current in reader.GetRecordsAsync<ContainerMetadata>())
             {
                 yield return current;
+            }
+        }
+
+        /// <summary>
+        /// ダウンロードを行います。
+        /// </summary>
+        /// <param name="metadata">対象コンテナのメタデータ</param>
+        /// <param name="destination">ダウンロード先</param>
+        public async Task DownloadContainerAsync(ContainerMetadata metadata, FileInfo destination)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                using var request = new HttpRequestMessage(HttpMethod.Get, metadata.DownloadUrl);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                await Console.Out.WriteLineAsync("コンテナのダウンロードを開始します");
+                using HttpResponseMessage response = await client.SendAsync(request);
+
+                using FileStream destStream = destination.Create();
+                await response.Content.CopyToAsync(destStream);
+
+                await Console.Out.WriteLineAsync("コンテナのダウンロードが完了しました");
+            }
+            finally
+            {
+                Console.ResetColor();
             }
         }
     }

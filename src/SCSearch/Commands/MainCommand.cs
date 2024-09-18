@@ -24,6 +24,7 @@ namespace SCSearch.Commands
             Description = "Galaxy COMMUNITY HUBのコンテナを検索します";
 
             Children.Add(new SearchCommand());
+            Children.Add(new DownloadCommand());
 
             optionHelp = new FlagOption('h', "help")
             {
